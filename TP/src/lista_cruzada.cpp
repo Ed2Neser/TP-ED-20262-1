@@ -168,6 +168,8 @@ int ListaCruzada::getNumColunas()
 
 int ListaCruzada::getLinhaItem(int item, int *&atributos, int *&modificadores)
 {
+    atributos = nullptr;
+    modificadores = nullptr;
     if (item < 0 || item >= num_linhas)
         return 0;
     int qntd = 0;
@@ -198,6 +200,8 @@ int ListaCruzada::getLinhaItem(int item, int *&atributos, int *&modificadores)
 
 int ListaCruzada::getColunaAtributo(int atributo, int *&itens, int *&modificadores)
 {
+    itens = nullptr;
+    modificadores = nullptr;
     if (atributo < 0 || atributo >= num_colunas)
         return 0;
     int qntd = 0;

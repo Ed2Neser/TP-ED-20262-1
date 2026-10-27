@@ -23,6 +23,6 @@ public:
     Pilha *getBuild();
 
     void equiparItem(int itemId); // adiciona o item à build e atualiza o vetor denso
-    void desequiparItem();        // remove o ultimo item da build e atualiza o vetor denso
+    int desequiparItem();         // remove e retorna o ultimo item da build
 };
 #endif

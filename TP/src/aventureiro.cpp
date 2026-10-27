@@ -30,7 +30,7 @@ void Aventureiro::equiparItem(int itemId)
     this->build.empilhar(itemId);
 
 } // adiciona o item à build e atualiza o vetor denso
-void Aventureiro::desequiparItem()
+int Aventureiro::desequiparItem()
 {
-    this->build.desempilhar();
+    return this->build.desempilhar();
 }

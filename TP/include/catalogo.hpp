@@ -18,11 +18,13 @@ public:
     void setModificador(int item, int atributo, int valor);
     int getModificador(int item, int atributo);
     int getNumMods();
+    void setNumAtributos(int numAtributos);
 
     int getLinhaItem(int item, int *&atributos, int *&modificadores);
     int getColunaAtributo(int atributo, int *&itens, int *&modificadores);
 
     double calcularPoder(int item);
+    double calcularEquilibrio(int item);
     double calcularEquilibrio(int item, double poder);
     double produtoInterno(int item, double *vetorBuild);
 

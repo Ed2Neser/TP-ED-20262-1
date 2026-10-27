@@ -1,7 +1,7 @@
 #include "catalogo.hpp"
 
-Catalogo::Catalogo(char modoInicial) : modo(modoInicial), lista_cruzada(nullptr), vetor_tripletas(nullptr),
-                                       num_itens(10), num_atts(10)
+Catalogo::Catalogo(char modoInicial) : lista_cruzada(nullptr), vetor_tripletas(nullptr), modo(modoInicial),
+                                       num_mods(0), num_atts(0), num_itens(0)
 {
     if (modoInicial == 'L')
     {
@@ -12,7 +12,6 @@ Catalogo::Catalogo(char modoInicial) : modo(modoInicial), lista_cruzada(nullptr)
         vetor_tripletas = new VetorTripletas();
     }
 
-    num_mods = 0;
 }
 Catalogo::~Catalogo()
 {
@@ -55,11 +54,17 @@ int Catalogo::getModificador(int item, int atributo)
     {
         return vetor_tripletas->getModificador(item, atributo);
     }
+    return 0;
 }
 
 int Catalogo::getNumMods()
 {
     return num_mods;
+}
+
+void Catalogo::setNumAtributos(int numAtributos)
+{
+    num_atts = numAtributos;
 }
 
 int Catalogo::getLinhaItem(int item, int *&atributos, int *&modificadores)
@@ -72,6 +77,9 @@ int Catalogo::getLinhaItem(int item, int *&atributos, int *&modificadores)
     {
         return vetor_tripletas->getLinhaItem(item, atributos, modificadores);
     }
+    atributos = nullptr;
+    modificadores = nullptr;
+    return 0;
 }
 
 int Catalogo::getColunaAtributo(int atributo, int *&itens, int *&modificadores)
@@ -84,6 +92,9 @@ int Catalogo::getColunaAtributo(int atributo, int *&itens, int *&modificadores)
     {
         return vetor_tripletas->getColunaAtributo(atributo, itens, modificadores);
     }
+    itens = nullptr;
+    modificadores = nullptr;
+    return 0;
 }
 
 double Catalogo::calcularPoder(int item)
@@ -96,18 +107,25 @@ double Catalogo::calcularPoder(int item)
     {
         return vetor_tripletas->calcularPoder(item);
     }
+    return 0.0;
 }
 
-double Catalogo::calcularEquilibrio(int item, double poder)
+double Catalogo::calcularEquilibrio(int item)
 {
     if (modo == 'L')
     {
-        return lista_cruzada->calcularEquilibrio(item, poder);
+        return lista_cruzada->calcularEquilibrio(item, num_atts);
     }
     else if (modo == 'T')
     {
-        return vetor_tripletas->calcularEquilibrio(item, poder);
+        return vetor_tripletas->calcularEquilibrio(item, num_atts);
     }
+    return 0.0;
+}
+
+double Catalogo::calcularEquilibrio(int item, double)
+{
+    return calcularEquilibrio(item);
 }
 
 double Catalogo::produtoInterno(int item, double *vetorBuild)
@@ -120,10 +138,15 @@ double Catalogo::produtoInterno(int item, double *vetorBuild)
     {
         return vetor_tripletas->produtoInterno(item, vetorBuild, num_atts);
     }
+    return 0.0;
 }
 
 void Catalogo::mudarModo(char novoModo, int numItens, int numAtributos, int numMods)
 {
+    num_itens = numItens;
+    num_atts = numAtributos;
+    num_mods = numMods;
+
     if ((modo == novoModo) || (novoModo != 'L' && novoModo != 'T'))
     {
         return; // Programação defensiva

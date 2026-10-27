@@ -30,7 +30,7 @@ void VetorTripletas::redimensionar()
 
 void VetorTripletas::adicionar(Tripleta t)
 {
-    // Verifica se já tem, para atualizar
+    // Atualiza uma célula existente ou remove-a quando o novo valor é zero.
     for (int i = 0; i < tamanho; i++)
     {
         if (tripletas[i].item_id == t.item_id && tripletas[i].atributo_id == t.atributo_id)
@@ -47,7 +47,6 @@ void VetorTripletas::adicionar(Tripleta t)
         }
     }
 
-    // valor 0 é ignorado
     if (t.valor == 0)
     {
         return;
@@ -58,7 +57,17 @@ void VetorTripletas::adicionar(Tripleta t)
         redimensionar();
     }
 
-    tripletas[tamanho] = t;
+    int indice = tamanho;
+    while (indice > 0 &&
+           (tripletas[indice - 1].item_id > t.item_id ||
+            (tripletas[indice - 1].item_id == t.item_id &&
+             tripletas[indice - 1].atributo_id > t.atributo_id)))
+    {
+        tripletas[indice] = tripletas[indice - 1];
+        indice--;
+    }
+
+    tripletas[indice] = t;
     tamanho++;
 }
 
@@ -217,6 +226,11 @@ double VetorTripletas::calcularPoder(int item)
 
 double VetorTripletas::calcularEquilibrio(int item, int numAtributosCadastrados)
 {
+    if (numAtributosCadastrados == 0)
+    {
+        return 1.0;
+    }
+
     double soma = 0.0;
     double media = calcularPoder(item) / numAtributosCadastrados;
     int k = 0;
@@ -230,13 +244,8 @@ double VetorTripletas::calcularEquilibrio(int item, int numAtributosCadastrados)
         }
     }
 
+    soma += (numAtributosCadastrados - k) * media * media;
     double desvio = std::sqrt(soma / numAtributosCadastrados);
-
-    if (k == 0)
-    {
-        return 0.0;
-    }
-
     return 1 / (1 + desvio);
 }
 double VetorTripletas::produtoInterno(int item, double *vetor_build, int numAtributosCadastrados)

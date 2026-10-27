@@ -1,6 +1,5 @@
 #ifndef VETOR_TRIPLETAS_HPP
 #define VETOR_TRIPLETAS_HPP
-#include "aventureiro.hpp"
 
 // tripleta é uma palavra mt feia pprt
 struct Tripleta // Estrutura assistente para armazenar três entidades diferentes.

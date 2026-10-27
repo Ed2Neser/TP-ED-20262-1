@@ -1,7 +1,7 @@
 #ifndef AVENTUREIRO_HPP
 #define AVENTUREIRO_HPP
 #include <string>
-#include "pilha.hpp"
+#include "../include/pilha.hpp"
 
 class Catalogo;
 

@@ -1,4 +1,4 @@
-#include "forja.hpp"
+#include "../include/forja.hpp"
 
 #include <cmath>
 #include <stdexcept>
@@ -6,7 +6,15 @@
 namespace
 {
     template <typename T>
-    void redimensionar(T *&elementos, int tamanho, int &capacidade)
+    void trocar(T &a, T &b) // metodo auxiliar pro quicksort
+    {
+        T temporario = a;
+        a = b;
+        b = temporario;
+    }
+
+    template <typename T>
+    void redimensionar(T *&elementos, int tamanho, int &capacidade) // redimensionar pros vetores da forja
     {
         if (tamanho < capacidade)
         {
@@ -33,13 +41,47 @@ namespace
         capacidade = novaCapacidade;
     }
 
-    struct ValorMetrica
+    template <typename T, typename Comparador>
+    void quicksort(T *elementos, int inicio, int fim, Comparador comparador) // quicksort tranquilo padrão
+    {
+        if (inicio >= fim)
+        {
+            return;
+        }
+
+        int esquerda = inicio;
+        int direita = fim;
+        T pivo = elementos[(inicio + fim) / 2];
+
+        while (esquerda <= direita)
+        {
+            while (comparador(elementos[esquerda], pivo))
+            {
+                esquerda++;
+            }
+            while (comparador(pivo, elementos[direita]))
+            {
+                direita--;
+            }
+            if (esquerda <= direita)
+            {
+                trocar(elementos[esquerda], elementos[direita]);
+                esquerda++;
+                direita--;
+            }
+        }
+
+        quicksort(elementos, inicio, direita, comparador);
+        quicksort(elementos, esquerda, fim, comparador);
+    }
+
+    struct ValorMetrica // auxiliar pra fazer a consulta Q com as métricas
     {
         int itemId;
         double valor;
     };
 
-    struct PontuacaoCentesimos
+    struct PontuacaoCentesimos //
     {
         int itemId;
         long long valor;
@@ -65,31 +107,21 @@ namespace
 
     void ordenar(ValorMetrica *elementos, int tamanho)
     {
-        for (int i = 1; i < tamanho; i++)
+        if (tamanho > 1)
         {
-            ValorMetrica atual = elementos[i];
-            int j = i - 1;
-            while (j >= 0 && precede(atual, elementos[j]))
-            {
-                elementos[j + 1] = elementos[j];
-                j--;
-            }
-            elementos[j + 1] = atual;
+            quicksort(elementos, 0, tamanho - 1,
+                      [](const ValorMetrica &a, const ValorMetrica &b)
+                      { return precede(a, b); });
         }
     }
 
     void ordenar(PontuacaoCentesimos *elementos, int tamanho)
     {
-        for (int i = 1; i < tamanho; i++)
+        if (tamanho > 1)
         {
-            PontuacaoCentesimos atual = elementos[i];
-            int j = i - 1;
-            while (j >= 0 && precede(atual, elementos[j]))
-            {
-                elementos[j + 1] = elementos[j];
-                j--;
-            }
-            elementos[j + 1] = atual;
+            quicksort(elementos, 0, tamanho - 1,
+                      [](const PontuacaoCentesimos &a, const PontuacaoCentesimos &b)
+                      { return precede(a, b); });
         }
     }
 
@@ -106,6 +138,8 @@ Forja::Forja(char modoInicial)
       itens(nullptr),
       num_itens(0),
       capacidade_itens(0),
+      capacidade_builds(0),
+      capacidade_equipamentos(0),
       aventureiros(nullptr),
       builds(nullptr),
       itens_equipados(nullptr),
@@ -134,59 +168,15 @@ Forja::~Forja()
     delete[] atributos;
     delete[] itens;
 }
+
 int Forja::cadastrarAtributo(const std::string &nome)
 {
+    if (num_atributos == capacidade_builds)
+    {
+        redimensionarBuilds();
+    }
     redimensionar(atributos, num_atributos, capacidade_atributos);
-
-    long long **novasBuilds = nullptr;
-    if (num_aventureiros > 0)
-    {
-        novasBuilds = new long long *[num_aventureiros];
-        int criadas = 0;
-        try
-        {
-            for (; criadas < num_aventureiros; criadas++)
-            {
-                novasBuilds[criadas] = new long long[num_atributos + 1];
-                for (int atributoId = 0; atributoId < num_atributos; atributoId++)
-                {
-                    novasBuilds[criadas][atributoId] = builds[criadas][atributoId];
-                }
-                novasBuilds[criadas][num_atributos] = 0;
-            }
-        }
-        catch (...)
-        {
-            for (int i = 0; i < criadas; i++)
-            {
-                delete[] novasBuilds[i];
-            }
-            delete[] novasBuilds;
-            throw;
-        }
-    }
-
-    try
-    {
-        atributos[num_atributos] = Atributo{num_atributos, nome};
-    }
-    catch (...)
-    {
-        for (int i = 0; i < num_aventureiros; i++)
-        {
-            delete[] novasBuilds[i];
-        }
-        delete[] novasBuilds;
-        throw;
-    }
-
-    for (int i = 0; i < num_aventureiros; i++)
-    {
-        delete[] builds[i];
-        builds[i] = novasBuilds[i];
-    }
-    delete[] novasBuilds;
-
+    atributos[num_atributos] = Atributo{num_atributos, nome};
     num_atributos++;
     catalogo.setNumAtributos(num_atributos);
     return num_atributos - 1;
@@ -194,57 +184,12 @@ int Forja::cadastrarAtributo(const std::string &nome)
 
 int Forja::cadastrarItem(const std::string &nome)
 {
+    if (num_itens == capacidade_equipamentos)
+    {
+        redimensionarEquipamentos();
+    }
     redimensionar(itens, num_itens, capacidade_itens);
-
-    int **novosEquipamentos = nullptr;
-    if (num_aventureiros > 0)
-    {
-        novosEquipamentos = new int *[num_aventureiros];
-        int criados = 0;
-        try
-        {
-            for (; criados < num_aventureiros; criados++)
-            {
-                novosEquipamentos[criados] = new int[num_itens + 1];
-                for (int itemId = 0; itemId < num_itens; itemId++)
-                {
-                    novosEquipamentos[criados][itemId] = itens_equipados[criados][itemId];
-                }
-                novosEquipamentos[criados][num_itens] = 0;
-            }
-        }
-        catch (...)
-        {
-            for (int i = 0; i < criados; i++)
-            {
-                delete[] novosEquipamentos[i];
-            }
-            delete[] novosEquipamentos;
-            throw;
-        }
-    }
-
-    try
-    {
-        itens[num_itens] = Item{num_itens, nome};
-    }
-    catch (...)
-    {
-        for (int i = 0; i < num_aventureiros; i++)
-        {
-            delete[] novosEquipamentos[i];
-        }
-        delete[] novosEquipamentos;
-        throw;
-    }
-
-    for (int i = 0; i < num_aventureiros; i++)
-    {
-        delete[] itens_equipados[i];
-        itens_equipados[i] = novosEquipamentos[i];
-    }
-    delete[] novosEquipamentos;
-
+    itens[num_itens] = Item{num_itens, nome};
     num_itens++;
     return num_itens - 1;
 }
@@ -290,13 +235,13 @@ int Forja::cadastrarAventureiro(const std::string &nome)
     Aventureiro *novoAventureiro = nullptr;
     try
     {
-        novaBuild = new long long[num_atributos];
-        novosEquipamentos = new int[num_itens];
-        for (int i = 0; i < num_atributos; i++)
+        novaBuild = new long long[capacidade_builds];
+        novosEquipamentos = new int[capacidade_equipamentos];
+        for (int i = 0; i < capacidade_builds; i++)
         {
             novaBuild[i] = 0;
         }
-        for (int i = 0; i < num_itens; i++)
+        for (int i = 0; i < capacidade_equipamentos; i++)
         {
             novosEquipamentos[i] = 0;
         }
@@ -315,6 +260,87 @@ int Forja::cadastrarAventureiro(const std::string &nome)
     itens_equipados[num_aventureiros] = novosEquipamentos;
     num_aventureiros++;
     return num_aventureiros - 1;
+}
+
+void Forja::redimensionarBuilds()
+{
+    int novaCapacidade = capacidade_builds == 0 ? 10 : capacidade_builds * 2;
+    long long **novasBuilds =
+        num_aventureiros == 0 ? nullptr : new long long *[num_aventureiros];
+    int criadas = 0;
+    try
+    {
+        for (; criadas < num_aventureiros; criadas++)
+        {
+            novasBuilds[criadas] = new long long[novaCapacidade];
+            for (int atributoId = 0; atributoId < capacidade_builds; atributoId++)
+            {
+                novasBuilds[criadas][atributoId] = builds[criadas][atributoId];
+            }
+            for (int atributoId = capacidade_builds; atributoId < novaCapacidade; atributoId++)
+            {
+                novasBuilds[criadas][atributoId] = 0;
+            }
+        }
+    }
+    catch (...)
+    {
+        for (int i = 0; i < criadas; i++)
+        {
+            delete[] novasBuilds[i];
+        }
+        delete[] novasBuilds;
+        throw;
+    }
+
+    for (int i = 0; i < num_aventureiros; i++)
+    {
+        delete[] builds[i];
+        builds[i] = novasBuilds[i];
+    }
+    delete[] novasBuilds;
+    capacidade_builds = novaCapacidade;
+}
+
+void Forja::redimensionarEquipamentos()
+{
+    int novaCapacidade =
+        capacidade_equipamentos == 0 ? 10 : capacidade_equipamentos * 2;
+    int **novosEquipamentos =
+        num_aventureiros == 0 ? nullptr : new int *[num_aventureiros];
+    int criados = 0;
+    try
+    {
+        for (; criados < num_aventureiros; criados++)
+        {
+            novosEquipamentos[criados] = new int[novaCapacidade];
+            for (int itemId = 0; itemId < capacidade_equipamentos; itemId++)
+            {
+                novosEquipamentos[criados][itemId] = itens_equipados[criados][itemId];
+            }
+            for (int itemId = capacidade_equipamentos; itemId < novaCapacidade; itemId++)
+            {
+                novosEquipamentos[criados][itemId] = 0;
+            }
+        }
+    }
+    catch (...)
+    {
+        for (int i = 0; i < criados; i++)
+        {
+            delete[] novosEquipamentos[i];
+        }
+        delete[] novosEquipamentos;
+        throw;
+    }
+
+    for (int i = 0; i < num_aventureiros; i++)
+    {
+        delete[] itens_equipados[i];
+        itens_equipados[i] = novosEquipamentos[i];
+    }
+    delete[] novosEquipamentos;
+    capacidade_equipamentos = novaCapacidade;
 }
 
 void Forja::definirModificador(int itemId, int atributoId, int valor)
@@ -599,6 +625,11 @@ ResultadoRecomendacoes Forja::recomendar(
         {
             buildDensa[atributoId] = static_cast<double>(builds[aventureiroId][atributoId]);
         }
+        double normaBuild = 0.0;
+        for (int atributoId = 0; atributoId < num_atributos; atributoId++)
+        {
+            normaBuild += buildDensa[atributoId] * buildDensa[atributoId];
+        }
 
         for (int indiceMetrica = 0; indiceMetrica < numMetricas; indiceMetrica++)
         {
@@ -615,7 +646,7 @@ ResultadoRecomendacoes Forja::recomendar(
                     valor = catalogo.calcularEquilibrio(itemId);
                     break;
                 case Metrica::SINERGIA:
-                    valor = catalogo.produtoInterno(itemId, buildDensa);
+                    valor = catalogo.produtoInterno(itemId, buildDensa, normaBuild);
                     break;
                 default:
                     throw std::invalid_argument("Metrica de recomendacao desconhecida.");

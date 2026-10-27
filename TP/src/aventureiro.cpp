@@ -1,5 +1,5 @@
-#include "aventureiro.hpp"
-#include "catalogo.hpp"
+#include "../include/aventureiro.hpp"
+#include "../include/catalogo.hpp"
 
 Aventureiro::Aventureiro(int id, std::string nome)
     : id(id), nome(nome), build()

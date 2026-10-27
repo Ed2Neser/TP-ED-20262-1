@@ -1,11 +1,11 @@
 #ifndef FORJA_HPP
 #define FORJA_HPP
 
-#include "atributo.hpp"
-#include "aventureiro.hpp"
-#include "catalogo.hpp"
-#include "fila.hpp"
-#include "item.hpp"
+#include "../include/atributo.hpp"
+#include "../include/aventureiro.hpp"
+#include "../include/catalogo.hpp"
+#include "../include/fila.hpp"
+#include "../include/item.hpp"
 
 #include <string>
 
@@ -78,6 +78,8 @@ private:
     Item *itens;
     int num_itens;
     int capacidade_itens;
+    int capacidade_builds;
+    int capacidade_equipamentos;
 
     Aventureiro **aventureiros;
     long long **builds;
@@ -88,6 +90,8 @@ private:
     Catalogo catalogo;
     Fila fila;
 
+    void redimensionarBuilds();
+    void redimensionarEquipamentos();
     void atualizarBuild(int aventureiroId, int itemId, int quantidade);
 
 public:

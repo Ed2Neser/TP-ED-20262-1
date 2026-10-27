@@ -1,7 +1,7 @@
 #ifndef CATALOGO_HPP
 #define CATALOGO_HPP
-#include "lista_cruzada.hpp"
-#include "vetor_tripletas.hpp"
+#include "../include/lista_cruzada.hpp"
+#include "../include/vetor_tripletas.hpp"
 
 class Catalogo // Classe que gerencia as transições entre as representções da tabela de modificadores.
 {
@@ -27,6 +27,7 @@ public:
     double calcularEquilibrio(int item);
     double calcularEquilibrio(int item, double poder);
     double produtoInterno(int item, double *vetorBuild);
+    double produtoInterno(int item, double *vetorBuild, double normaBuild);
 
     void mudarModo(char novoModo, int numItens, int numAtributos, int numMods);
 };

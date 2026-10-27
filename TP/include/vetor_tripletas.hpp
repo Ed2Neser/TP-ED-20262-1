@@ -15,6 +15,7 @@ private:
     Tripleta *tripletas;
     int tamanho; // igual a num_mods
     int capacidade;
+    int indiceInicialItem(int item) const;
 
 public:
     VetorTripletas();
@@ -37,6 +38,7 @@ public:
     double calcularPoder(int item);
     double calcularEquilibrio(int item, int numAtributosCadastrados);
     double produtoInterno(int item, double *vetor_build, int numAtributosCadastrados);
+    double produtoInterno(int item, double *vetor_build, double normaBuild);
 
     // Métodos para facilitar e usar o "range-based for loop" (for each)
     Tripleta *begin();

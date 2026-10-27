@@ -1,4 +1,4 @@
-#include "catalogo.hpp"
+#include "../include/catalogo.hpp"
 
 Catalogo::Catalogo(char modoInicial) : lista_cruzada(nullptr), vetor_tripletas(nullptr), modo(modoInicial),
                                        num_mods(0), num_atts(0), num_itens(0)
@@ -11,7 +11,6 @@ Catalogo::Catalogo(char modoInicial) : lista_cruzada(nullptr), vetor_tripletas(n
     {
         vetor_tripletas = new VetorTripletas();
     }
-
 }
 Catalogo::~Catalogo()
 {
@@ -130,13 +129,23 @@ double Catalogo::calcularEquilibrio(int item, double)
 
 double Catalogo::produtoInterno(int item, double *vetorBuild)
 {
+    double normaBuild = 0.0;
+    for (int atributo = 0; atributo < num_atts; atributo++)
+    {
+        normaBuild += vetorBuild[atributo] * vetorBuild[atributo];
+    }
+    return produtoInterno(item, vetorBuild, normaBuild);
+}
+
+double Catalogo::produtoInterno(int item, double *vetorBuild, double normaBuild)
+{
     if (modo == 'L')
     {
-        return lista_cruzada->produtoInterno(item, vetorBuild, num_atts);
+        return lista_cruzada->produtoInterno(item, vetorBuild, normaBuild);
     }
     else if (modo == 'T')
     {
-        return vetor_tripletas->produtoInterno(item, vetorBuild, num_atts);
+        return vetor_tripletas->produtoInterno(item, vetorBuild, normaBuild);
     }
     return 0.0;
 }

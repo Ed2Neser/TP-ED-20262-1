@@ -1,4 +1,4 @@
-#include "lista_cruzada.hpp"
+#include "../include/lista_cruzada.hpp"
 #include <cmath>
 
 ListaCruzada::ListaCruzada()
@@ -138,7 +138,8 @@ void ListaCruzada::setValorCelula(int item, int atributo, int valor)
         if (valor != 0)
         {
             // insere
-            Celula *novaCelula = new Celula{item, atributo, valor, anteriorLinha->prox_atributo, anteriorColuna->prox_item};
+            Celula *novaCelula = new Celula{
+                item, atributo, valor, anteriorColuna->prox_item, anteriorLinha->prox_atributo};
             anteriorLinha->prox_atributo = novaCelula;
             anteriorColuna->prox_item = novaCelula;
         }
@@ -257,54 +258,53 @@ double ListaCruzada::calcularEquilibrio(int item, int numAtributosCadastrados)
         return 1;
 
     double poder = calcularPoder(item);
-
     double media = poder / numAtributosCadastrados;
-
-    double desvio = 0.0;
-
-    for (int i = 0; i < numAtributosCadastrados; i++)
+    double soma = 0.0;
+    int quantidade = 0;
+    Celula *celula = linhas[item]->prox_atributo;
+    while (celula != nullptr)
     {
-        double mod = getValorCelula(item, i);
-        double sqr = (mod - media) * (mod - media);
-        desvio += (sqr);
+        double diferenca = celula->valor - media;
+        soma += diferenca * diferenca;
+        quantidade++;
+        celula = celula->prox_atributo;
     }
 
-    desvio = std::sqrt(desvio / numAtributosCadastrados);
-
+    soma += (numAtributosCadastrados - quantidade) * media * media;
+    double desvio = std::sqrt(soma / numAtributosCadastrados);
     return 1 / (1 + desvio);
 }
 
 double ListaCruzada::produtoInterno(int item, double *vetorBuild, int numAtributosCadastrados)
 {
-    if (numAtributosCadastrados == 0)
-        return 0.0;
-
-    double soma_vb = 0.0;
-    double soma_v_sqr = 0.0;
-    double soma_b_sqr = 0.0;
-
-    int *atts = nullptr;
-    int *mods = nullptr;
-    int qntd = getLinhaItem(item, atts, mods);
-
-    for (int i = 0; i < qntd; i++)
-    {
-        int m = mods[i];
-        soma_vb += m * vetorBuild[atts[i]];
-        soma_v_sqr += m * m;
-    }
-
+    double normaBuild = 0.0;
     for (int i = 0; i < numAtributosCadastrados; i++)
     {
-        soma_b_sqr += vetorBuild[i] * vetorBuild[i];
+        normaBuild += vetorBuild[i] * vetorBuild[i];
+    }
+    return produtoInterno(item, vetorBuild, normaBuild);
+}
+
+double ListaCruzada::produtoInterno(int item, double *vetorBuild, double normaBuild)
+{
+    double soma_vb = 0.0;
+    double soma_v_sqr = 0.0;
+    if (item < 0 || item >= num_linhas || normaBuild == 0.0)
+    {
+        return 0.0;
     }
 
-    delete[] atts;
-    delete[] mods;
+    Celula *celula = linhas[item]->prox_atributo;
+    while (celula != nullptr)
+    {
+        soma_vb += celula->valor * vetorBuild[celula->atributo];
+        soma_v_sqr += static_cast<double>(celula->valor) * celula->valor;
+        celula = celula->prox_atributo;
+    }
 
-    if (soma_v_sqr == 0.0 || soma_b_sqr == 0.0)
+    if (soma_v_sqr == 0.0)
         return 0.0;
-    return soma_vb / (std::sqrt(soma_v_sqr) * std::sqrt(soma_b_sqr));
+    return soma_vb / (std::sqrt(soma_v_sqr) * std::sqrt(normaBuild));
 }
 
 int *ListaCruzada::obterTodosElementos(int numMods)

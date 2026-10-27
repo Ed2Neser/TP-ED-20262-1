@@ -1,6 +1,5 @@
 #ifndef LISTA_CRUZADA_HPP
 #define LISTA_CRUZADA_HPP
-#include "aventureiro.hpp"
 
 struct Celula
 {
@@ -40,6 +39,7 @@ public:
     double calcularPoder(int item);
     double calcularEquilibrio(int item, int numAtributosCadastrados);
     double produtoInterno(int item, double *vetor_build, int numAtributosCadastrados);
+    double produtoInterno(int item, double *vetor_build, double normaBuild);
 
     int *obterTodosElementos(int numMods); // retorna um array no formato [atributo, item, valor...]
 };

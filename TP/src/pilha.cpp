@@ -1,4 +1,4 @@
-#include "pilha.hpp"
+#include "../include/pilha.hpp"
 
 Pilha::Pilha() : elementos(nullptr), tamanho(0), capacidade(10)
 {

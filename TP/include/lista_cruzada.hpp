@@ -25,7 +25,7 @@ private:
     void redimensionarColunas();
 
 public:
-    ListaCruzada(int numLinhas, int numColunas);
+    ListaCruzada();
     ~ListaCruzada();
 
     void setValorCelula(int item, int atributo, int valor);

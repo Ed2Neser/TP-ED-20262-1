@@ -18,7 +18,7 @@ private:
     int capacidade;
 
 public:
-    VetorTripletas(int numItens, int numAtributos); // inicializa o vetor usando o maior dos parâmetros.
+    VetorTripletas();
     ~VetorTripletas();
 
     void adicionar(Tripleta tripletas);
@@ -36,7 +36,7 @@ public:
     int getColunaAtributo(int atributo, int *&itens, int *&modificadores);
 
     double calcularPoder(int item);
-    double calcularEquilibrio(int item, double poder);
+    double calcularEquilibrio(int item, int numAtributosCadastrados);
     double produtoInterno(int item, double *vetor_build, int numAtributosCadastrados);
 
     // Métodos para facilitar e usar o "range-based for loop" (for each)

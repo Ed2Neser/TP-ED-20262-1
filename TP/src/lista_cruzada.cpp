@@ -1,17 +1,17 @@
 #include "lista_cruzada.hpp"
 #include <cmath>
 
-ListaCruzada::ListaCruzada(int numLinhas, int numColunas)
+ListaCruzada::ListaCruzada()
 {
-    this->num_linhas = numLinhas;
-    this->num_colunas = numColunas;
-    this->linhas = new Celula *[numLinhas];
-    this->colunas = new Celula *[numColunas];
-    for (int i = 0; i < numLinhas; i++)
+    this->num_linhas = 10;
+    this->num_colunas = 10;
+    this->linhas = new Celula *[10];
+    this->colunas = new Celula *[10];
+    for (int i = 0; i < 10; i++)
     {
         linhas[i] = new Celula{i, -1, 0, nullptr, nullptr}; // sentinelas
     }
-    for (int j = 0; j < numColunas; j++)
+    for (int j = 0; j < 10; j++)
     {
         colunas[j] = new Celula{-1, j, 0, nullptr, nullptr}; // sentinelas
     }

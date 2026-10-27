@@ -5,11 +5,11 @@ Catalogo::Catalogo(char modoInicial) : modo(modoInicial), lista_cruzada(nullptr)
 {
     if (modoInicial == 'L')
     {
-        lista_cruzada = new ListaCruzada(10, 10);
+        lista_cruzada = new ListaCruzada();
     }
     else if (modoInicial == 'T')
     {
-        vetor_tripletas = new VetorTripletas(10, 10);
+        vetor_tripletas = new VetorTripletas();
     }
 
     num_mods = 0;
@@ -130,7 +130,7 @@ void Catalogo::mudarModo(char novoModo, int numItens, int numAtributos, int numM
     }
     else if (novoModo == 'L')
     {
-        this->lista_cruzada = new ListaCruzada(numItens, numAtributos);
+        this->lista_cruzada = new ListaCruzada();
 
         for (Tripleta t : *(this->vetor_tripletas))
         {
@@ -142,7 +142,7 @@ void Catalogo::mudarModo(char novoModo, int numItens, int numAtributos, int numM
     }
     else if (novoModo == 'T')
     {
-        this->vetor_tripletas = new VetorTripletas(numItens, numAtributos);
+        this->vetor_tripletas = new VetorTripletas();
         int *celulas = lista_cruzada->obterTodosElementos(num_mods);
         if (celulas != nullptr)
         {

@@ -1,33 +1,13 @@
 #include "aventureiro.hpp"
 #include "catalogo.hpp"
 
-Aventureiro::Aventureiro(int id, std::string nome, bool usarModoImediato)
-    : id(id), nome(nome), build(), vetor_build_imediato(nullptr), capacidade_atributos(0), modo_imediato(usarModoImediato)
+Aventureiro::Aventureiro(int id, std::string nome)
+    : id(id), nome(nome), build()
 {
 }
 
 Aventureiro::~Aventureiro()
 {
-    delete[] vetor_build_imediato;
-}
-
-void Aventureiro::redimensionarVetorBuild() // dobra o tamanho do vetor denso
-{
-    int novoTamanho = capacidade_atributos == 0 ? 1 : capacidade_atributos * 2;
-    int *novoVetor = new int[novoTamanho]();
-
-    // Copia os valores antigos para o novo vetor
-    for (int i = 0; i < capacidade_atributos; ++i)
-    {
-        novoVetor[i] = vetor_build_imediato[i];
-    }
-
-    // Libera a memória do vetor antigo
-    delete[] vetor_build_imediato;
-
-    // Atualiza o ponteiro e a capacidade
-    vetor_build_imediato = novoVetor;
-    capacidade_atributos = novoTamanho;
 }
 
 int Aventureiro::getId()
@@ -40,19 +20,17 @@ std::string Aventureiro::getNome()
     return nome;
 }
 
-Pilha &Aventureiro::getBuild()
+Pilha *Aventureiro::getBuild()
 {
-    return build;
+    return &build;
 }
 
-int *Aventureiro::getVetorBuildImediato()
+void Aventureiro::equiparItem(int itemId)
 {
-    return vetor_build_imediato;
-}
+    this->build.empilhar(itemId);
 
-// estrategia (para testes) de build sob demanda (custo de consulta  O(n))
-int *Aventureiro::computarBuildSobDemanda(Catalogo *catalogo, int numAtributosCadastrados)
+} // adiciona o item à build e atualiza o vetor denso
+void Aventureiro::desequiparItem()
 {
-    // Implementação da computação da build sob demanda
-    return nullptr;
+    this->build.desempilhar();
 }

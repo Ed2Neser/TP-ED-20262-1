@@ -1,15 +1,18 @@
 #include "catalogo.hpp"
 
-Catalogo::Catalogo(int numItens, int numAtributos, char modoInicial) : modo(modoInicial), lista_cruzada(nullptr), vetor_tripletas(nullptr)
+Catalogo::Catalogo(char modoInicial) : modo(modoInicial), lista_cruzada(nullptr), vetor_tripletas(nullptr),
+                                       num_itens(10), num_atts(10)
 {
     if (modoInicial == 'L')
     {
-        lista_cruzada = new ListaCruzada(numItens, numAtributos);
+        lista_cruzada = new ListaCruzada(10, 10);
     }
     else if (modoInicial == 'T')
     {
-        vetor_tripletas = new VetorTripletas(numItens, numAtributos);
+        vetor_tripletas = new VetorTripletas(10, 10);
     }
+
+    num_mods = 0;
 }
 Catalogo::~Catalogo()
 {
@@ -19,28 +22,27 @@ Catalogo::~Catalogo()
 
 void Catalogo::setModificador(int item, int atributo, int valor)
 {
+
+    int valorAntigo = getModificador(item, atributo);
+
+    if (valorAntigo == 0 && valor != 0)
+    {
+        num_mods++; // nova célula criada
+    }
+    else if (valorAntigo != 0 && valor == 0)
+    {
+        num_mods--; // célula foi removida
+    }
+
     if (modo == 'L')
     {
-        lista_cruzada->setCelula(item, atributo, valor);
+        lista_cruzada->setValorCelula(item, atributo, valor);
     }
     else if (modo == 'T')
     {
         Tripleta tripleta = {atributo, item, valor};
         vetor_tripletas->adicionar(tripleta); // método terá de verificar se já existe e atualizar ou adicionar
-    }
-}
-void Catalogo::removerModificador(int item, int atributo)
-{
-
-    if (modo == 'L')
-    {
-        lista_cruzada->removerCelula(item, atributo);
-    }
-    else if (modo == 'T')
-    {
-        Tripleta tripleta = {atributo, item, 0}; // valor não é relevante para remoção
-        vetor_tripletas->remover(tripleta);      // método terá de verificar se existe e remover
-    }
+    };
 }
 
 int Catalogo::getModificador(int item, int atributo)
@@ -55,27 +57,32 @@ int Catalogo::getModificador(int item, int atributo)
     }
 }
 
-int *Catalogo::percorrerLinhaItem(int item)
+int Catalogo::getNumMods()
+{
+    return num_mods;
+}
+
+int Catalogo::getLinhaItem(int item, int *&atributos, int *&modificadores)
 {
     if (modo == 'L')
     {
-        return lista_cruzada->percorrerLinhaItem(item);
+        return lista_cruzada->getLinhaItem(item, atributos, modificadores);
     }
     else if (modo == 'T')
     {
-        return vetor_tripletas->percorrerLinhaItem(item);
+        return vetor_tripletas->getLinhaItem(item, atributos, modificadores);
     }
 }
 
-int *Catalogo::percorrerColunaAtributo(int atributo)
+int Catalogo::getColunaAtributo(int atributo, int *&itens, int *&modificadores)
 {
     if (modo == 'L')
     {
-        return lista_cruzada->percorrerColunaAtributo(atributo);
+        return lista_cruzada->getColunaAtributo(atributo, itens, modificadores);
     }
     else if (modo == 'T')
     {
-        return vetor_tripletas->percorrerColunaAtributo(atributo);
+        return vetor_tripletas->getColunaAtributo(atributo, itens, modificadores);
     }
 }
 
@@ -103,15 +110,15 @@ double Catalogo::calcularEquilibrio(int item, double poder)
     }
 }
 
-double Catalogo::produtoInterno(int item, int *vetorBuild, int numAtributosCadastrados)
+double Catalogo::produtoInterno(int item, double *vetorBuild)
 {
     if (modo == 'L')
     {
-        return lista_cruzada->produtoInterno(item, vetorBuild, numAtributosCadastrados);
+        return lista_cruzada->produtoInterno(item, vetorBuild, num_atts);
     }
     else if (modo == 'T')
     {
-        return vetor_tripletas->produtoInterno(item, vetorBuild, numAtributosCadastrados);
+        return vetor_tripletas->produtoInterno(item, vetorBuild, num_atts);
     }
 }
 
@@ -127,18 +134,19 @@ void Catalogo::mudarModo(char novoModo, int numItens, int numAtributos, int numM
 
         for (Tripleta t : *(this->vetor_tripletas))
         {
-            lista_cruzada->setCelula(t.item_id, t.atributo_id, t.valor);
+            lista_cruzada->setValorCelula(t.item_id, t.atributo_id, t.valor);
         }
         modo = 'L';
-        delete[] vetor_tripletas; // Libera a memória do vetor de tripletas antigo
+        delete vetor_tripletas; // Libera a memória do vetor de tripletas antigo
+        vetor_tripletas = nullptr;
     }
     else if (novoModo == 'T')
     {
         this->vetor_tripletas = new VetorTripletas(numItens, numAtributos);
-        int *celulas = lista_cruzada->obterTodosElementos(numMods);
-        if (celulas == nullptr)
+        int *celulas = lista_cruzada->obterTodosElementos(num_mods);
+        if (celulas != nullptr)
         {
-            for (int i = 0; i < numMods * 3; i += 3)
+            for (int i = 0; i < num_mods * 3; i += 3)
             {
                 Tripleta tripleta = {celulas[i], celulas[i + 1], celulas[i + 2]};
                 vetor_tripletas->adicionar(tripleta);
@@ -146,7 +154,8 @@ void Catalogo::mudarModo(char novoModo, int numItens, int numAtributos, int numM
         }
 
         modo = 'T';
-        delete[] lista_cruzada; // Libera a memória da lista cruzada antiga
-        delete[] celulas;       // Libera a memória do array de células
+        delete lista_cruzada; // Libera a memória da lista cruzada antiga
+        lista_cruzada = nullptr;
+        delete[] celulas; // Libera a memória do array de células
     }
 }

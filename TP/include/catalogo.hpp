@@ -9,24 +9,22 @@ private:
     ListaCruzada *lista_cruzada;     // Representação da tabela de modificadores como uma lista cruzada.
     VetorTripletas *vetor_tripletas; // Representação da tabela de modificadores como um vetor de tripletas.
     char modo;                       // L = lista cruzada, T = vetor de tripletas
-
-    int *itens;     // Array de IDs dos itens cadastrados
-    int *atributos; // Array de IDs dos atributos cadastrados
+    int num_mods, num_atts, num_itens;
 
 public:
-    Catalogo(int numItens, int numAtributos, char modoInicial);
+    Catalogo(char modoInicial);
     ~Catalogo();
 
     void setModificador(int item, int atributo, int valor);
-    void removerModificador(int item, int atributo);
     int getModificador(int item, int atributo);
+    int getNumMods();
 
-    int *percorrerLinhaItem(int item);
-    int *percorrerColunaAtributo(int atributo);
+    int getLinhaItem(int item, int *&atributos, int *&modificadores);
+    int getColunaAtributo(int atributo, int *&itens, int *&modificadores);
 
     double calcularPoder(int item);
     double calcularEquilibrio(int item, double poder);
-    double produtoInterno(int item, int *vetorBuild, int numAtributosCadastrados);
+    double produtoInterno(int item, double *vetorBuild);
 
     void mudarModo(char novoModo, int numItens, int numAtributos, int numMods);
 };

@@ -27,7 +27,9 @@ int Pilha::desempilhar()
         return -1; // Retorna um valor inválido caso a pilha esteja vazia
     }
     tamanho--;
-    return elementos[tamanho];
+    int item = elementos[tamanho];
+    elementos[tamanho] = -1;
+    return item;
 }
 
 void Pilha::redimensionar()
@@ -37,8 +39,8 @@ void Pilha::redimensionar()
     {
         temp[i] = elementos[i];
     }
+    delete[] elementos;
     elementos = temp;
-    delete[] temp;
     capacidade *= 2;
 }
 

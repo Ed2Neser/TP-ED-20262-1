@@ -1,5 +1,6 @@
 #ifndef VETOR_TRIPLETAS_HPP
 #define VETOR_TRIPLETAS_HPP
+#include "aventureiro.hpp"
 
 // tripleta é uma palavra mt feia pprt
 struct Tripleta // Estrutura assistente para armazenar três entidades diferentes.
@@ -13,7 +14,7 @@ class VetorTripletas // Vetor de tripletas.
 {
 private:
     Tripleta *tripletas;
-    int tamanho;
+    int tamanho; // igual a num_mods
     int capacidade;
 
 public:
@@ -31,12 +32,12 @@ public:
     void ordenarPorItem();     // Ordena as tripletas pelo ID do item.
     void ordenarPorAtributo(); // Ordena as tripletas pelo ID do atributo.
 
-    int *percorrerLinhaItem(int item);
-    int *percorrerColunaAtributo(int atributo);
+    int getLinhaItem(int item, int *&atributos, int *&modificadores);
+    int getColunaAtributo(int atributo, int *&itens, int *&modificadores);
 
     double calcularPoder(int item);
     double calcularEquilibrio(int item, double poder);
-    double produtoInterno(int item, int *vetorBuild, int numAtributosCadastrados);
+    double produtoInterno(int item, double *vetor_build, int numAtributosCadastrados);
 
     // Métodos para facilitar e usar o "range-based for loop" (for each)
     Tripleta *begin();

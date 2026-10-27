@@ -1,11 +1,13 @@
 #ifndef LISTA_CRUZADA_HPP
 #define LISTA_CRUZADA_HPP
+#include "aventureiro.hpp"
 
 struct Celula
 {
-    int item, atributo, valor;        // item = linha, atributo = coluna, valor = modificação
-    Celula *proxItem, *prox_atributo; // ponteiros para a próxima célula na linha e na coluna
+    int item, atributo, valor;         // item = linha, atributo = coluna, valor = modificação
+    Celula *prox_item, *prox_atributo; // ponteiros para a próxima célula na linha e na coluna
     //     prox linha  prox coluna      (não nulos) em uma mesma coluna/linha
+    // para os cabeças, valor = 0.
 };
 
 class ListaCruzada // Lista cruzada de entidades.
@@ -19,23 +21,25 @@ private:
     Celula *AntLinha(int item, int atributo) const;  // Retorna a célula anterior à célula (i, j) na mesma linha
     Celula *AntColuna(int item, int atributo) const; // Retorna a célula anterior à célula (i, j) na mesma coluna
 
+    void redimensionarLinhas();
+    void redimensionarColunas();
+
 public:
     ListaCruzada(int numLinhas, int numColunas);
     ~ListaCruzada();
 
-    void setCelula(int item, int atributo, int valor);
-    void removerCelula(int item, int atributo);
-
+    void setValorCelula(int item, int atributo, int valor);
     int getValorCelula(int item, int atributo);
+
     int getNumLinhas();
     int getNumColunas();
 
-    int *percorrerLinhaItem(int item);
-    int *percorrerColunaAtributo(int atributo);
+    int getLinhaItem(int item, int *&atributos, int *&modificadores);
+    int getColunaAtributo(int atributo, int *&itens, int *&modificadores);
 
     double calcularPoder(int item);
-    double calcularEquilibrio(int item, double poder);
-    double produtoInterno(int item, int *vetorBuild, int numAtributosCadastrados);
+    double calcularEquilibrio(int item, int numAtributosCadastrados);
+    double produtoInterno(int item, double *vetor_build, int numAtributosCadastrados);
 
     int *obterTodosElementos(int numMods); // retorna um array no formato [atributo, item, valor...]
 };

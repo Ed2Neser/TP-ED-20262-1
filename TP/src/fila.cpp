@@ -42,8 +42,8 @@ void Fila::redimensionar()
     {
         temp[i] = elementos[(velho + i) % capacidade];
     }
+    delete[] elementos;
     elementos = temp;
-    delete[] temp;
     capacidade *= 2;
     novo = tamanho;
     velho = 0;

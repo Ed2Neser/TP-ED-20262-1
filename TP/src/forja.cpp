@@ -134,7 +134,7 @@ Forja::~Forja()
     delete[] atributos;
     delete[] itens;
 }
-c int Forja::cadastrarAtributo(const std::string &nome)
+int Forja::cadastrarAtributo(const std::string &nome)
 {
     redimensionar(atributos, num_atributos, capacidade_atributos);
 
